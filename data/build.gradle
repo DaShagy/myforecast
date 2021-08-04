@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
@@ -9,19 +9,19 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "io.realm:realm-gradle-plugin:5.11.0"
+        classpath "io.realm:realm-gradle-plugin:5.2.0"
     }
 }
 
 realm {
     syncEnabled = true;
 }
+
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
-        applicationId "com.globant.myapplication"
         minSdkVersion 17
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -29,9 +29,10 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 repositories {
@@ -41,32 +42,19 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':domain')
-    implementation project(path: ':di')
 
     def lib = rootProject.ext.generalDependencies
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation lib.coroutinesAndroid
-    implementation lib.coroutinesCore
-    implementation lib.androidx_viewmodel
     implementation lib.appcompat
-    implementation lib.coreKtx
-    implementation lib.constraintlayout
-    implementation lib.viewmodel
 
     testImplementation lib.junit_version
     androidTestImplementation lib.test_runner_version
     androidTestImplementation lib.espresso_core_version
 
-    testImplementation lib.google_truth_version
-    testImplementation lib.mockito_core_version
-    testImplementation lib.koin_test
-
-    testImplementation lib.coreTest
-    testImplementation lib.coroutinesCore
-    testImplementation lib.coroutinesAndroid
-    testImplementation lib.coroutinesTest
+    // Retrofit & OkHttp
+    implementation lib.retrofit2
+    implementation lib.retrofitComverterGson
+    implementation lib.okhttp3LoggingInterceptor
 
     debugImplementation lib.chucker
     releaseImplementation lib.chuckerReleaseImplementation
-
 }
