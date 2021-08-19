@@ -6,6 +6,6 @@ import org.koin.core.inject
 
 class GetDailyWeatherByLatitudeAndLongitudeUseCase : KoinComponent {
     private val weatherInformationRepository: WeatherInformationRepository by inject()
-    operator fun invoke(lat: Double, lon: Double, getFromRemote: Boolean) =
-        weatherInformationRepository.getDailyWeatherByLatitudeAndLongitude(lat, lon, getFromRemote)
+    operator fun invoke(getFromRemote: Boolean) =
+        weatherInformationRepository.getDailyWeatherByLatitudeAndLongitude(getFromRemote)
 }
