@@ -30,7 +30,7 @@ class DayWeatherInformation (
     val windGust: Double = DEFAULT_DOUBLE,
     val weather: List<WeatherDetail>? = null,
     val clouds: Int = DEFAULT_INT,
-    val pop: Int = DEFAULT_INT,
+    val pop: Double = DEFAULT_DOUBLE,
     val uvi: Double = DEFAULT_DOUBLE
 )
 

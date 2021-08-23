@@ -27,7 +27,7 @@ class DaylyWeatherInfoResponse (
     @SerializedName ("wind_gust")val windGust: Double,
     val weather: List<WeatherDetailResponse>,
     val clouds: Int,
-    val pop: Int,
+    val pop: Double,
     val uvi: Double
 )
 
