@@ -7,10 +7,10 @@ class WeatherInfoResponse(
     val lon: Double,
     val timezone: String,
     @SerializedName ("timezone_offset") val timezoneOffset: Int,
-    val daily: List<DaylyWeatherInfoResponse>
+    val daily: List<DailyWeatherInfoResponse>
 )
 
-class DaylyWeatherInfoResponse (
+class DailyWeatherInfoResponse (
     val dt: Int,
     val sunrise: Int,
     val sunset: Int,

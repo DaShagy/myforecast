@@ -22,12 +22,12 @@ open class WeatherInfoMapperService : BaseMapperRepository<WeatherInfoResponse, 
         TODO("Not yet implemented")
     }
 }
-class DailyWeatherMapperService : BaseMapperRepository<DaylyWeatherInfoResponse, DayWeatherInformation>{
+class DailyWeatherMapperService : BaseMapperRepository<DailyWeatherInfoResponse, DayWeatherInformation>{
 
     private val temperatureMapperService = TemperatureMapperService()
     private val dayTemperatureMapperService = DayTemperatureMapperService()
 
-    override fun transform(type: DaylyWeatherInfoResponse): DayWeatherInformation =
+    override fun transform(type: DailyWeatherInfoResponse): DayWeatherInformation =
         DayWeatherInformation(
             type.dt,
             type.sunrise,
@@ -49,12 +49,12 @@ class DailyWeatherMapperService : BaseMapperRepository<DaylyWeatherInfoResponse,
             type.uvi
         )
 
-    private fun transformWeatherDetailList(type: DaylyWeatherInfoResponse) : List<WeatherDetail>{
+    private fun transformWeatherDetailList(type: DailyWeatherInfoResponse) : List<WeatherDetail>{
         val dayWeatherDetailMapperService = DayWeatherDetailMapperService()
         return type.weather.map { dayWeatherDetailMapperService.transform(it) }
     }
 
-    override fun transformToRepository(type: DayWeatherInformation): DaylyWeatherInfoResponse {
+    override fun transformToRepository(type: DayWeatherInformation): DailyWeatherInfoResponse {
         TODO("Not yet implemented")
     }
 }
