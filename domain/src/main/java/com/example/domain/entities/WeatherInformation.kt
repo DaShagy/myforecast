@@ -5,7 +5,7 @@ const val DEFAULT_INT = 0
 const val NOT_FOUND = "Not Found"
 
 
-class WeatherInformation(
+data class WeatherInformation(
     val lat: Double = DEFAULT_DOUBLE,
     val lon: Double = DEFAULT_DOUBLE,
     val timezone: String = NOT_FOUND,
@@ -13,7 +13,7 @@ class WeatherInformation(
     val daily: List<DayWeatherInformation>? = null
 )
 
-class DayWeatherInformation (
+data class DayWeatherInformation (
     val dt: Int = DEFAULT_INT,
     val sunrise: Int = DEFAULT_INT,
     val sunset: Int = DEFAULT_INT,
@@ -34,23 +34,20 @@ class DayWeatherInformation (
     val uvi: Double = DEFAULT_DOUBLE
 )
 
-open class Temperature (
+data class Temperature (
     val day: Double = DEFAULT_DOUBLE,
     val night: Double = DEFAULT_DOUBLE,
     val eve: Double = DEFAULT_DOUBLE,
     val morn: Double = DEFAULT_DOUBLE
 )
 
-class DayTemperature (
+data class DayTemperature (
     val max: Double = DEFAULT_DOUBLE,
     val min: Double = DEFAULT_DOUBLE,
-    day: Double = DEFAULT_DOUBLE,
-    night: Double = DEFAULT_DOUBLE,
-    eve: Double = DEFAULT_DOUBLE,
-    morn: Double = DEFAULT_DOUBLE
-): Temperature(day, night, eve, morn)
+    val temp: Temperature? = null
+)
 
-class WeatherDetail (
+data class WeatherDetail (
     val id: Int = DEFAULT_INT,
     val main: String = NOT_FOUND,
     val description: String = NOT_FOUND,
