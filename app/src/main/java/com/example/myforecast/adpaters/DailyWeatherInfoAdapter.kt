@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.domain.entities.DayWeatherInformation
 import com.example.myforecast.R
+import com.example.myforecast.databinding.ActivityMainBinding
+import com.example.myforecast.databinding.ListDayWeatherInfoBinding
 import com.example.myforecast.utils.toLocalDateTime
 import com.google.android.material.card.MaterialCardView
 import java.time.format.DateTimeFormatter
@@ -25,30 +27,25 @@ class DailyWeatherInfoAdapter(private val context: Context)
         dataset = data
     }
 
-    class DailyWeatherInfoViewHolder(private val view: View)
-        : RecyclerView.ViewHolder(view) {
-        val cardView: MaterialCardView = view.findViewById(R.id.day_card)
-        val dtTextView: TextView = view.findViewById(R.id.dt)
-        val temperatureTextView: TextView = view.findViewById(R.id.temperature)
-    }
+    class DailyWeatherInfoViewHolder(val binding: ListDayWeatherInfoBinding)
+        : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyWeatherInfoViewHolder{
-        val adapterLayout = LayoutInflater.from(parent.context)
-            .inflate(R.layout.list_day_weather_info, parent, false)
 
-        return DailyWeatherInfoViewHolder(adapterLayout)
+        val binding = ListDayWeatherInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return DailyWeatherInfoViewHolder(binding)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: DailyWeatherInfoViewHolder,
                                   position: Int) {
-        val item = dataset[position]
-        val itemCardView = holder.cardView
-        val date = toLocalDateTime(item.dt)
-        holder.dtTextView.text = date.dayOfWeek.toString()
-        holder.temperatureTextView.text = "MAX/MIN: ${item.temp!!.max}/ ${item.temp!!.min}"
-
-        itemCardView.setOnClickListener { showDayWeatherAlertDialog(item) }
+        with (holder){
+            with (dataset[position]){
+                binding.dt.text = toLocalDateTime(this.dt).dayOfWeek.toString()
+                binding.temperature.text = "MAX/MIN: ${this.temp!!.max}/ ${this.temp!!.min}"
+                binding.dayCard.setOnClickListener{ showDayWeatherAlertDialog(this)}
+            }
+        }
     }
 
     override fun getItemCount()= dataset.size
@@ -68,7 +65,7 @@ class DailyWeatherInfoAdapter(private val context: Context)
         alertDialogBuilder
             .setTitle(toLocalDateTime(day.dt).toString())
             .setMessage(message)
-            .setNeutralButton("VOLVER") { dialogInterface: DialogInterface, i: Int -> }
+            .setNeutralButton("VOLVER") { _: DialogInterface, _: Int -> }
             .show()
     }
 

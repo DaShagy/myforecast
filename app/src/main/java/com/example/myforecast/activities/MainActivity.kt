@@ -10,6 +10,7 @@ import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
+import com.example.myforecast.databinding.ActivityMainBinding
 import com.example.myforecast.utils.Data
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.Status
@@ -17,6 +18,7 @@ import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,15 +26,21 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModel<WeatherInfoViewModel>()
 
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
 
         viewModel.mainState.observe(::getLifecycle, ::updateUI)
 
         dayWeatherInfoAdapter = DailyWeatherInfoAdapter(this)
 
-        var recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        var recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
         recyclerView.setHasFixedSize(true)
 
