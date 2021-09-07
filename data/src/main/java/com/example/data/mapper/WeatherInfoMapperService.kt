@@ -3,7 +3,7 @@ package com.example.data.mapper
 import com.example.data.service.response.*
 import com.example.domain.entities.*
 
-open class WeatherInfoMapperService : BaseMapperRepository<WeatherInfoResponse, WeatherInformation> {
+class WeatherInfoMapperService : BaseMapperRepository<WeatherInfoResponse, WeatherInformation> {
     override fun transform(type: WeatherInfoResponse): WeatherInformation =
         WeatherInformation(
             type.lat,
@@ -14,8 +14,7 @@ open class WeatherInfoMapperService : BaseMapperRepository<WeatherInfoResponse, 
         )
 
     private fun transformDailyWeatherList(type: WeatherInfoResponse): List<DayWeatherInformation> {
-        val dailyWeatherMapperService = DailyWeatherMapperService()
-        return type.daily.map { dailyWeatherMapperService.transform(it) }
+        return type.daily.map { DailyWeatherMapperService().transform(it) }
     }
 
     override fun transformToRepository(type: WeatherInformation): WeatherInfoResponse {
@@ -23,9 +22,6 @@ open class WeatherInfoMapperService : BaseMapperRepository<WeatherInfoResponse, 
     }
 }
 class DailyWeatherMapperService : BaseMapperRepository<DailyWeatherInfoResponse, DayWeatherInformation>{
-
-    private val temperatureMapperService = TemperatureMapperService()
-    private val dayTemperatureMapperService = DayTemperatureMapperService()
 
     override fun transform(type: DailyWeatherInfoResponse): DayWeatherInformation =
         DayWeatherInformation(
@@ -35,8 +31,8 @@ class DailyWeatherMapperService : BaseMapperRepository<DailyWeatherInfoResponse,
             type.moonrise,
             type.moonset,
             type.moonPhase,
-            dayTemperatureMapperService.transform(type.temp),
-            temperatureMapperService.transform(type.feelsLike),
+            DayTemperatureMapperService().transform(type.temp),
+            TemperatureMapperService().transform(type.feelsLike),
             type.pressure,
             type.humidity,
             type.dewPoint,
@@ -76,13 +72,11 @@ class TemperatureMapperService : BaseMapperRepository<TemperatureResponse, Tempe
 
 class DayTemperatureMapperService : BaseMapperRepository<DayTemperatureResponse, DayTemperature>{
 
-    private val temperatureMapperService = TemperatureMapperService()
-
     override fun transform(type: DayTemperatureResponse): DayTemperature =
         DayTemperature(
             type.max,
             type.min,
-            temperatureMapperService.transform(
+            TemperatureMapperService().transform(
                 TemperatureResponse(
                     type.day,
                     type.night,
