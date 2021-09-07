@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.domain.entities.DayWeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.databinding.ActivityMainBinding
@@ -41,9 +42,10 @@ class DailyWeatherInfoAdapter(private val context: Context)
                                   position: Int) {
         with (holder){
             with (dataset[position]){
-                binding.dt.text = toLocalDateTime(this.dt).dayOfWeek.toString()
-                binding.temperature.text = "MAX/MIN: ${this.temp!!.max}/ ${this.temp!!.min}"
                 binding.dayCard.setOnClickListener{ showDayWeatherAlertDialog(this)}
+                binding.temperature.text = "${this.temp!!.max}°C/ ${this.temp!!.min}°C"
+                binding.day.text = toLocalDateTime(this.dt).dayOfWeek.toString()
+                binding.weatherIcon.load("http://openweathermap.org/img/wn/${this.weather!![0].icon}@2x.png")
             }
         }
     }
@@ -52,18 +54,21 @@ class DailyWeatherInfoAdapter(private val context: Context)
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun showDayWeatherAlertDialog(day: DayWeatherInformation){
-        val formatter : DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val timeFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+        val dayFormatter  : DateTimeFormatter = DateTimeFormatter.ofPattern("EE dd/MMM")
+
+        val title = toLocalDateTime(day.dt).format(dayFormatter)
 
         val message = "MAX: ${day.temp!!.max}\n" +
                 "MIN: ${day.temp!!.min}\n" +
                 "WEATHER: ${day.weather!![0].description}\n" +
-                "SUNRISE TIME: ${toLocalDateTime(day.sunrise).format(formatter)}\n" +
-                "SUNSET TIME: ${toLocalDateTime(day.sunset).format(formatter)}\n" +
+                "SUNRISE TIME: ${toLocalDateTime(day.sunrise).format(timeFormatter)}\n" +
+                "SUNSET TIME: ${toLocalDateTime(day.sunset).format(timeFormatter)}\n" +
                 "WIND SPEED: ${day.windSpeed}"
 
         val alertDialogBuilder = AlertDialog.Builder(context)
         alertDialogBuilder
-            .setTitle(toLocalDateTime(day.dt).toString())
+            .setTitle(title)
             .setMessage(message)
             .setNeutralButton("VOLVER") { _: DialogInterface, _: Int -> }
             .show()
