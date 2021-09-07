@@ -5,15 +5,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
 import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
-import com.example.myforecast.utils.Data
 import com.example.myforecast.utils.Event
-import com.example.myforecast.utils.Status
+import com.example.myforecast.utils.DataStatus
 import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -63,18 +61,21 @@ class MainActivity : AppCompatActivity() {
         viewModel.onRemoteSearch()
     }
 
-    private fun updateUI(weatherData: Event<Data<WeatherInformation>>) {
-        when (weatherData.peekContent().responseType) {
-            Status.ERROR -> {
+    private fun updateUI(weatherData: Event<DataStatus<WeatherInformation>>) {
+        var result = weatherData.peekContent()
+        when (result) {
+            is DataStatus.Error -> {
                 hideProgress()
-                weatherData.peekContent().error?.message?.let { showMessage(this, it) }
+                result.error.message.let {
+                    showMessage(this, it ?: "No se pudo recuperar el mensaje de error")
+                }
             }
-            Status.LOADING -> {
+            is DataStatus.Loading -> {
                 showProgress()
             }
-            Status.SUCCESSFUL -> {
+            is DataStatus.Successful -> {
                 hideProgress()
-                weatherData.peekContent().data?.let { setWeatherInfo(it) }
+                setWeatherInfo(result.data)
             }
         }
     }
