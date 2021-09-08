@@ -19,7 +19,7 @@ import com.example.myforecast.utils.toLocalDateTime
 import com.google.android.material.card.MaterialCardView
 import java.time.format.DateTimeFormatter
 
-class DailyWeatherInfoAdapter(private val context: Context)
+class DailyWeatherInfoAdapter(private val listener: (DayWeatherInformation) -> Unit)
     : RecyclerView.Adapter<DailyWeatherInfoAdapter.DailyWeatherInfoViewHolder>() {
 
     private var dataset = mutableListOf<DayWeatherInformation>()
@@ -28,13 +28,22 @@ class DailyWeatherInfoAdapter(private val context: Context)
         dataset = data
     }
 
-    class DailyWeatherInfoViewHolder(val binding: ListDayWeatherInfoBinding)
-        : RecyclerView.ViewHolder(binding.root)
+    class DailyWeatherInfoViewHolder(val binding: ListDayWeatherInfoBinding,
+                                     val onItemClicked: (Int) -> Unit)
+        : RecyclerView.ViewHolder(binding.root) {
+            init {
+                binding.root.setOnClickListener {
+                    onItemClicked(absoluteAdapterPosition)
+                }
+            }
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyWeatherInfoViewHolder{
 
         val binding = ListDayWeatherInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DailyWeatherInfoViewHolder(binding)
+        return DailyWeatherInfoViewHolder(binding){
+            listener(dataset[it])
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -42,7 +51,6 @@ class DailyWeatherInfoAdapter(private val context: Context)
                                   position: Int) {
         with (holder){
             with (dataset[position]){
-                binding.dayCard.setOnClickListener{ showDayWeatherAlertDialog(this)}
                 binding.temperature.text = "${this.temp!!.max}°C/ ${this.temp!!.min}°C"
                 binding.day.text = toLocalDateTime(this.dt).dayOfWeek.toString()
                 binding.weatherIcon.load("http://openweathermap.org/img/wn/${this.weather!![0].icon}@2x.png")
@@ -51,27 +59,4 @@ class DailyWeatherInfoAdapter(private val context: Context)
     }
 
     override fun getItemCount()= dataset.size
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun showDayWeatherAlertDialog(day: DayWeatherInformation){
-        val timeFormatter : DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-        val dayFormatter  : DateTimeFormatter = DateTimeFormatter.ofPattern("EE dd/MMM")
-
-        val title = toLocalDateTime(day.dt).format(dayFormatter)
-
-        val message = "MAX: ${day.temp!!.max}\n" +
-                "MIN: ${day.temp!!.min}\n" +
-                "WEATHER: ${day.weather!![0].description}\n" +
-                "SUNRISE TIME: ${toLocalDateTime(day.sunrise).format(timeFormatter)}\n" +
-                "SUNSET TIME: ${toLocalDateTime(day.sunset).format(timeFormatter)}\n" +
-                "WIND SPEED: ${day.windSpeed}"
-
-        val alertDialogBuilder = AlertDialog.Builder(context)
-        alertDialogBuilder
-            .setTitle(title)
-            .setMessage(message)
-            .setNeutralButton("VOLVER") { _: DialogInterface, _: Int -> }
-            .show()
-    }
-
 }

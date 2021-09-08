@@ -1,10 +1,12 @@
 package com.example.myforecast.activities
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
@@ -12,6 +14,7 @@ import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
+import com.example.myforecast.utils.showDayWeatherAlertDialog
 import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,7 +40,11 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.mainState.observe(::getLifecycle, ::updateUI)
 
-        dayWeatherInfoAdapter = DailyWeatherInfoAdapter(this)
+        dayWeatherInfoAdapter = DailyWeatherInfoAdapter {
+            dayWeatherInformation -> (
+                onClickedRecyclerViewItem(dayWeatherInformation)
+                )
+        }
 
         var recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
@@ -83,6 +91,11 @@ class MainActivity : AppCompatActivity() {
     private fun setWeatherInfo(weatherInformation: WeatherInformation) {
         dayWeatherInfoAdapter.updateDataset(weatherInformation.daily as MutableList<DayWeatherInformation>)
         dayWeatherInfoAdapter.notifyDataSetChanged()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun onClickedRecyclerViewItem(info: DayWeatherInformation){
+        showDayWeatherAlertDialog(info, this)
     }
 
     private fun showProgress() {
