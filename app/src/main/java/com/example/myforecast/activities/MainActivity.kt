@@ -12,6 +12,7 @@ import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
+import com.example.myforecast.ui.alertdialogs.WeatherDetailsAlertDialog
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
 import com.example.myforecast.utils.showDayWeatherAlertDialog
@@ -95,7 +96,7 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onClickedRecyclerViewItem(info: DayWeatherInformation){
-        showDayWeatherAlertDialog(info, this)
+        WeatherDetailsAlertDialog().buildAndShowAlertDialog(info, this)
     }
 
     private fun showProgress() {
