@@ -112,6 +112,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onDialogSearchClick(dialog: DialogFragment, dialogEditText: String) {
-        viewModel.onRemoteSearch(dialogEditText)
+        viewModel.onRemoteSearch()
     }
 }
