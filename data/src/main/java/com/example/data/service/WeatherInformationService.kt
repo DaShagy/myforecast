@@ -11,8 +11,8 @@ class WeatherInformationService {
     private val api: OpenWeatherRequestGenerator = OpenWeatherRequestGenerator()
     private val infoMapper: WeatherInfoMapperService = WeatherInfoMapperService()
 
-    fun getDailyWeatherByLatitudeAndLongitude() : Result<WeatherInformation> {
-        val callResponse = api.createService(OpenWeatherApi::class.java).getDailyWeatherByLatitudeAndLongitude()
+    fun getDailyWeatherByCity(city: String): Result<WeatherInformation> {
+        val callResponse = api.createService(OpenWeatherApi::class.java).getDailyWeatherByCity()
         val response = callResponse.execute()
         if (response != null) {
             if (response.isSuccessful) {

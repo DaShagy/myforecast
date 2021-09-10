@@ -24,7 +24,7 @@ private const val INIT_TRYOUT = 1
 
 class OpenWeatherRequestGenerator {
 
-    val context = getApplicationContext()
+    private val context = getApplicationContext()
 
     private val httpClient = OkHttpClient.Builder()
         .addInterceptor(

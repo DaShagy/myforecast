@@ -5,19 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.example.di.useCasesModule
 import com.example.domain.entities.WeatherInformation
-import com.example.domain.usecases.GetDailyWeatherByLatitudeAndLongitudeUseCase
+import com.example.domain.usecases.GetDailyWeatherByCityUseCase
 import com.example.domain.util.Result
 import com.example.myforecast.utils.Data
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.Status
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
-import com.google.common.truth.Truth
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,8 +42,8 @@ class WeatherInfoViewModelTest : AutoCloseKoinTest() {
     @Mock lateinit var weatherInfo: WeatherInformation
     @Mock lateinit var exception: Exception
 
-    private val getDailyWeatherByLatitudeAndLongitude :
-            GetDailyWeatherByLatitudeAndLongitudeUseCase by inject()
+    private val getDailyWeatherByCity :
+            GetDailyWeatherByCityUseCase by inject()
 
     @ExperimentalCoroutinesApi
     @ObsoleteCoroutinesApi
@@ -56,9 +54,9 @@ class WeatherInfoViewModelTest : AutoCloseKoinTest() {
             modules(listOf(useCasesModule))
         }
 
-        declareMock<GetDailyWeatherByLatitudeAndLongitudeUseCase>()
+        declareMock<GetDailyWeatherByCityUseCase>()
         MockitoAnnotations.initMocks(this)
-        subject = WeatherInfoViewModel(getDailyWeatherByLatitudeAndLongitude)
+        subject = WeatherInfoViewModel(getDailyWeatherByCity)
     }
 
     @ExperimentalCoroutinesApi
@@ -76,7 +74,7 @@ class WeatherInfoViewModelTest : AutoCloseKoinTest() {
         val successStatusEvent : Event<Data<WeatherInformation>> = Event(Data(Status.SUCCESSFUL, data = weatherInfo))
 
         val liveDataUnderTest = subject.mainState.testObserver()
-        whenever(getDailyWeatherByLatitudeAndLongitude.invoke(true)).thenReturn(weatherInfoValidResult)
+        whenever(getDailyWeatherByCity.invoke(true)).thenReturn(weatherInfoValidResult)
         whenever(weatherInfoValidResult.data).thenReturn(weatherInfo)
         runBlocking {
             subject.onRemoteSearch().join()

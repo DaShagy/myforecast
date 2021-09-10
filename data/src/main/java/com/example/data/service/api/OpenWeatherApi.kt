@@ -6,5 +6,5 @@ import retrofit2.http.GET
 
 interface OpenWeatherApi {
     @GET("/data/2.5/onecall")
-    fun getDailyWeatherByLatitudeAndLongitude(): Call<WeatherInfoResponse>
+    fun getDailyWeatherByCity(): Call<WeatherInfoResponse>
 }

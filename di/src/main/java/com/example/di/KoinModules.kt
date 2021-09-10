@@ -3,7 +3,7 @@ package com.example.di
 import com.example.data.mapper.*
 import com.example.data.repositories.WeatherInformationRepositoryImpl
 import com.example.domain.repositories.WeatherInformationRepository
-import com.example.domain.usecases.GetDailyWeatherByLatitudeAndLongitudeUseCase
+import com.example.domain.usecases.GetDailyWeatherByCityUseCase
 import org.koin.dsl.module
 
 val repositoriesModule = module {
@@ -16,5 +16,5 @@ val repositoriesModule = module {
 }
 
 val useCasesModule = module {
-    single { GetDailyWeatherByLatitudeAndLongitudeUseCase() }
+    single { GetDailyWeatherByCityUseCase() }
 }

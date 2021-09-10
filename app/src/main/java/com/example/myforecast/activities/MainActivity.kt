@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(),
                 )
         }
 
-        var recyclerView = binding.root.recycler_view
+        val recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
         recyclerView.setHasFixedSize(true)
     }
@@ -72,8 +72,7 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun updateUI(weatherData: Event<DataStatus<WeatherInformation>>) {
-        var result = weatherData.peekContent()
-        when (result) {
+        when (val result = weatherData.peekContent()) {
             is DataStatus.Error -> {
                 hideProgress()
                 result.error.message.let {
@@ -112,6 +111,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onDialogSearchClick(dialog: DialogFragment, dialogEditText: String) {
-        viewModel.onRemoteSearch()
+        viewModel.onRemoteSearch(dialogEditText)
     }
 }
