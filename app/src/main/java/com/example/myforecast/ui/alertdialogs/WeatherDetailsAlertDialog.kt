@@ -1,17 +1,22 @@
 package com.example.myforecast.ui.alertdialogs
 
-import android.content.Context
-import android.content.DialogInterface
+import android.app.Dialog
+
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import com.example.domain.entities.DayWeatherInformation
 import com.example.myforecast.utils.toLocalDateTime
 import java.time.format.DateTimeFormatter
 
-class WeatherDetailsAlertDialog : AlertDialog {
+class WeatherDetailsAlertDialog(private val day: DayWeatherInformation) : DialogFragment(){
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun buildAndShowAlertDialog(day: Any, context: Context) {
-        if (day is DayWeatherInformation) {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return activity?.let{
+            val builder = AlertDialog.Builder(it)
+
             val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
             val dayFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EE dd/MMM")
 
@@ -22,12 +27,10 @@ class WeatherDetailsAlertDialog : AlertDialog {
                     "SUNSET TIME: ${toLocalDateTime(day.sunset).format(timeFormatter)}\n" +
                     "WIND SPEED: ${day.windSpeed}"
 
-            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(context)
-            alertDialogBuilder
-                .setTitle(title)
+            builder.setTitle(title)
                 .setMessage(message)
-                .setNeutralButton("VOLVER") { _: DialogInterface, _: Int -> }
-                .show()
-        }
+                .create()
+
+        } ?: throw IllegalStateException("Activity cannot be null")
     }
 }

@@ -7,5 +7,4 @@ import org.koin.dsl.module
 
 val viewModelModules = module {
     viewModel { WeatherInfoViewModel(get()) }
-    single { WeatherDetailsAlertDialog() }
 }

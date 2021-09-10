@@ -26,5 +26,4 @@
         app:layoutManager="LinearLayoutManager"/>
 
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>

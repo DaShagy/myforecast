@@ -7,22 +7,24 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.DialogFragment
 import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
+import com.example.myforecast.ui.alertdialogs.SearchByCityAlertDialog
 import com.example.myforecast.ui.alertdialogs.WeatherDetailsAlertDialog
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
-import com.example.myforecast.utils.showDayWeatherAlertDialog
 import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+        SearchByCityAlertDialog.NoticeDialogListener{
 
     private lateinit var dayWeatherInfoAdapter: DailyWeatherInfoAdapter
 
@@ -50,8 +52,6 @@ class MainActivity : AppCompatActivity() {
         var recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
         recyclerView.setHasFixedSize(true)
-
-        onSearchClicked()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,7 +67,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onSearchClicked() {
-        viewModel.onRemoteSearch()
+        val alertDialog = SearchByCityAlertDialog()
+        alertDialog.show(supportFragmentManager, "search_by_city")
     }
 
     private fun updateUI(weatherData: Event<DataStatus<WeatherInformation>>) {
@@ -96,7 +97,8 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onClickedRecyclerViewItem(info: DayWeatherInformation){
-        WeatherDetailsAlertDialog().buildAndShowAlertDialog(info, this)
+        val alertDialog = WeatherDetailsAlertDialog(info)
+        alertDialog.show(supportFragmentManager, "")
     }
 
     private fun showProgress() {
@@ -107,5 +109,9 @@ class MainActivity : AppCompatActivity() {
     private fun hideProgress() {
         progress.visibility = View.GONE
         recycler_view.visibility  = View.VISIBLE
+    }
+
+    override fun onDialogSearchClick(dialog: DialogFragment, dialogEditText: String) {
+        viewModel.onRemoteSearch(dialogEditText)
     }
 }
