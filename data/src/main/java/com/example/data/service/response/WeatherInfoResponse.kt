@@ -2,7 +2,7 @@ package com.example.data.service.response
 
 import com.google.gson.annotations.SerializedName
 
-class WeatherInfoResponse(
+data class WeatherInfoResponse(
     val lat: Double,
     val lon: Double,
     val timezone: String,
@@ -10,7 +10,7 @@ class WeatherInfoResponse(
     val daily: List<DailyWeatherInfoResponse>
 )
 
-class DailyWeatherInfoResponse (
+data class DailyWeatherInfoResponse (
     val dt: Int,
     val sunrise: Int,
     val sunset: Int,
@@ -31,14 +31,14 @@ class DailyWeatherInfoResponse (
     val uvi: Double
 )
 
-class TemperatureResponse (
+data class TemperatureResponse (
     val day: Double,
     val night: Double,
     val eve: Double,
     val morn: Double
 )
 
-class DayTemperatureResponse (
+data class DayTemperatureResponse (
     val max: Double,
     val min: Double,
     val day: Double,
@@ -48,7 +48,7 @@ class DayTemperatureResponse (
 )
 
 
-class WeatherDetailResponse (
+data class WeatherDetailResponse (
     val id: Int,
     val main: String,
     val description: String,

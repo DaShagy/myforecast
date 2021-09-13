@@ -29,17 +29,17 @@ class SearchByCityAlertDialog() : DialogFragment() {
 
             _binding = SearchByCityAlertDialogBinding.inflate(inflater)
 
+
             val builder = AlertDialog.Builder(it)
-
-            val text = binding.root.editText.text.toString()
-
             builder.setView(binding.root)
                 .setTitle("Ingrese ciudad")
                 .setNegativeButton("Volver"){
                         _, _ ->
                 }
                 .setPositiveButton("Buscar",){
-                        _, _ -> listener.onDialogSearchClick(this, text)
+                        _, _ ->
+                    val text = binding.root.cityToSearch.text.toString()
+                    listener.onDialogSearchClick(this, text)
                 }
                 .create()
 
