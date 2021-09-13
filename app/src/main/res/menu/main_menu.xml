@@ -2,9 +2,9 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Refresh"
-        android:icon="@drawable/ic_refresh_button"
-        android:id="@+id/refresh_button"
+    <item android:title="Search City"
+        android:icon="@drawable/ic_search_button"
+        android:id="@+id/search_city_button"
         app:showAsAction="ifRoom"
         />
 </menu>

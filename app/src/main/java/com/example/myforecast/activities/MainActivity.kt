@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.refresh_button -> { onSearchClicked() }
+            R.id.search_city_button -> { onSearchClicked() }
         }
         return super.onOptionsItemSelected(item)
     }
