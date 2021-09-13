@@ -1,5 +1,7 @@
 package com.example.myforecast.activities
 
+import android.annotation.SuppressLint
+import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +21,8 @@ import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
 import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
@@ -33,6 +37,9 @@ class MainActivity : AppCompatActivity(),
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +59,13 @@ class MainActivity : AppCompatActivity(),
         val recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
         recyclerView.setHasFixedSize(true)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
+                showMessage(this, location.toString())
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

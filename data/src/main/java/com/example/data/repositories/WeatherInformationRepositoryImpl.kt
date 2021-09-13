@@ -15,4 +15,15 @@ class WeatherInformationRepositoryImpl : WeatherInformationRepository {
         }
         return Result.Failure(Exception())
     }
+
+    override fun getDailyWeatherByCoordinates(
+        lat: String,
+        lon: String,
+        getFromRemote: Boolean,
+    ): Result<WeatherInformation> {
+        if (getFromRemote) {
+            return WeatherInformationService().getDailyWeatherByCoordinates(lat, lon)
+        }
+        return Result.Failure(Exception())
+    }
 }

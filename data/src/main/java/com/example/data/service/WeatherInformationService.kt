@@ -3,7 +3,6 @@ package com.example.data.service
 import com.example.data.OpenWeatherRequestGenerator
 import com.example.data.mapper.WeatherInfoMapperService
 import com.example.data.service.api.OpenWeatherApi
-import com.example.data.service.response.Coordinates
 import com.example.domain.entities.WeatherInformation
 import com.example.domain.util.Result
 
@@ -12,11 +11,11 @@ class WeatherInformationService {
     private val api: OpenWeatherRequestGenerator = OpenWeatherRequestGenerator()
     private val infoMapper: WeatherInfoMapperService = WeatherInfoMapperService()
 
-    fun getDailyWeatherByCoordinates(coord: Coordinates): Result<WeatherInformation> {
+    fun getDailyWeatherByCoordinates(lat: String, lon: String): Result<WeatherInformation> {
 
         val filter = HashMap<String, String>()
-        filter["lat"] = coord.lat.toString()
-        filter["lon"] = coord.lon.toString()
+        filter["lat"] = lat
+        filter["lon"] = lon
         filter["exclude"] = "current,minutely,hourly,alerts"
         filter["units"] = "metric"
 
@@ -37,7 +36,10 @@ class WeatherInformationService {
         val response = callResponse.execute()
         if (response != null) {
             if (response.isSuccessful) {
-                response.body()?.let { return getDailyWeatherByCoordinates(it.coord) }
+                response.body()?.let { return getDailyWeatherByCoordinates(
+                    it.coord.lat.toString(),
+                    it.coord.lon.toString()
+                ) }
             }
             return Result.Failure(Exception(response.message()))
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.entities.WeatherInformation
 import com.example.domain.usecases.GetDailyWeatherByCityUseCase
+import com.example.domain.usecases.GetDailyWeatherByCoordinatesUseCase
 import com.example.domain.util.Result
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
@@ -13,7 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class WeatherInfoViewModel(val getDailyWeatherByCity: GetDailyWeatherByCityUseCase)
+class WeatherInfoViewModel(
+    val getDailyWeatherByCity: GetDailyWeatherByCityUseCase,
+    val getDailyWeatherByCoordinates: GetDailyWeatherByCoordinatesUseCase)
     : ViewModel() {
 
     private var _mainState: MutableLiveData<Event<DataStatus<WeatherInformation>>> = MutableLiveData()
@@ -33,4 +36,22 @@ class WeatherInfoViewModel(val getDailyWeatherByCity: GetDailyWeatherByCityUseCa
             }
         }
     }
-}
+
+    fun onOpenAppSearch(lat: String, lon: String) = viewModelScope.launch {
+        _mainState.value = Event(DataStatus.Loading)
+        when (val result = withContext(Dispatchers.IO) {
+            getDailyWeatherByCoordinates(
+                lat = lat,
+                lon = lon,
+                getFromRemote = true)
+        }) {
+            is Result.Failure -> {
+                _mainState.value = Event(DataStatus.Error(error = result.exception))
+            }
+            is Result.Success -> {
+                _mainState.value = Event(DataStatus.Successful(data = result.data))
+            }
+        }
+    }
+
+    }
