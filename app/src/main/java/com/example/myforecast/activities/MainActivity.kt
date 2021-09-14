@@ -1,6 +1,7 @@
 package com.example.myforecast.activities
 
-import android.annotation.SuppressLint
+import android.Manifest
+import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -9,12 +10,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
+import com.example.myforecast.ui.alertdialogs.AskPermissionsAlertDialog
 import com.example.myforecast.ui.alertdialogs.SearchByCityAlertDialog
 import com.example.myforecast.ui.alertdialogs.WeatherDetailsAlertDialog
 import com.example.myforecast.utils.Event
@@ -28,7 +32,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MainActivity : AppCompatActivity(),
-        SearchByCityAlertDialog.NoticeDialogListener{
+    SearchByCityAlertDialog.NoticeDialogListener,
+    AskPermissionsAlertDialog.PermissionDialogListener{
 
     private lateinit var dayWeatherInfoAdapter: DailyWeatherInfoAdapter
 
@@ -38,8 +43,9 @@ class MainActivity : AppCompatActivity(),
     private val binding get() = _binding!!
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val FINE_LOCATION_PERMISSION_CODE = 1
 
-    @SuppressLint("MissingPermission")
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,11 +67,8 @@ class MainActivity : AppCompatActivity(),
         recyclerView.setHasFixedSize(true)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        retrieveLocation()
 
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location : Location? ->
-                showMessage(this, location.toString())
-            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -111,7 +114,7 @@ class MainActivity : AppCompatActivity(),
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onClickedRecyclerViewItem(info: DayWeatherInformation){
         val alertDialog = WeatherDetailsAlertDialog(info)
-        alertDialog.show(supportFragmentManager, "")
+        alertDialog.show(supportFragmentManager, "recycler_view_item")
     }
 
     private fun showProgress() {
@@ -126,5 +129,52 @@ class MainActivity : AppCompatActivity(),
 
     override fun onDialogSearchClick(dialog: DialogFragment, dialogEditText: String) {
         viewModel.onRemoteSearch(dialogEditText)
+    }
+
+    fun onOpenAppSearch(location: Location){
+        viewModel.onOpenAppSearch(location.latitude.toString(), location.longitude.toString())
+    }
+
+    private fun requestLocationPermission(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            val alertDialog = AskPermissionsAlertDialog()
+            alertDialog.show(supportFragmentManager, "permissions")
+        } else {
+            grantPermission()
+        }
+    }
+
+    override fun onPermissionGrantedClick(dialog: DialogFragment) {
+        grantPermission()
+    }
+
+    private fun grantPermission(){
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_CODE)
+        retrieveLocation()
+    }
+
+    private fun retrieveLocation(){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED){
+
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        onOpenAppSearch(it)
+                    } ?: run {
+                        showMessage(this@MainActivity, "No se pudo encontrar su localización")
+                        onSearchClicked()
+                    }
+                }
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED){
+            onSearchClicked()
+        } else {
+            requestLocationPermission()
+        }
     }
 }
