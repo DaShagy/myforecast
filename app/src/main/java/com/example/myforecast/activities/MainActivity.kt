@@ -1,5 +1,8 @@
 package com.example.myforecast.activities
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,21 +10,30 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import com.example.domain.entities.DayWeatherInformation
 import com.example.domain.entities.WeatherInformation
 import com.example.myforecast.R
 import com.example.myforecast.adpaters.DailyWeatherInfoAdapter
 import com.example.myforecast.databinding.ActivityMainBinding
+import com.example.myforecast.ui.alertdialogs.AskPermissionsAlertDialog
+import com.example.myforecast.ui.alertdialogs.SearchByCityAlertDialog
+import com.example.myforecast.ui.alertdialogs.WeatherDetailsAlertDialog
 import com.example.myforecast.utils.Event
 import com.example.myforecast.utils.DataStatus
-import com.example.myforecast.utils.showDayWeatherAlertDialog
 import com.example.myforecast.utils.showMessage
 import com.example.myforecast.viewmodels.WeatherInfoViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+    SearchByCityAlertDialog.NoticeDialogListener,
+    AskPermissionsAlertDialog.PermissionDialogListener{
 
     private lateinit var dayWeatherInfoAdapter: DailyWeatherInfoAdapter
 
@@ -29,6 +41,10 @@ class MainActivity : AppCompatActivity() {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val FINE_LOCATION_PERMISSION_CODE = 1
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +62,13 @@ class MainActivity : AppCompatActivity() {
                 )
         }
 
-        var recyclerView = binding.root.recycler_view
+        val recyclerView = binding.root.recycler_view
         recyclerView.adapter = dayWeatherInfoAdapter
         recyclerView.setHasFixedSize(true)
 
-        onSearchClicked()
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        retrieveLocation()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -60,18 +78,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.refresh_button -> { onSearchClicked() }
+            R.id.search_city_button -> { onSearchClicked() }
         }
         return super.onOptionsItemSelected(item)
     }
 
     private fun onSearchClicked() {
-        viewModel.onRemoteSearch()
+        val alertDialog = SearchByCityAlertDialog()
+        alertDialog.show(supportFragmentManager, "search_by_city")
     }
 
     private fun updateUI(weatherData: Event<DataStatus<WeatherInformation>>) {
-        var result = weatherData.peekContent()
-        when (result) {
+        when (val result = weatherData.peekContent()) {
             is DataStatus.Error -> {
                 hideProgress()
                 result.error.message.let {
@@ -95,7 +113,8 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun onClickedRecyclerViewItem(info: DayWeatherInformation){
-        showDayWeatherAlertDialog(info, this)
+        val alertDialog = WeatherDetailsAlertDialog(info)
+        alertDialog.show(supportFragmentManager, "recycler_view_item")
     }
 
     private fun showProgress() {
@@ -106,5 +125,56 @@ class MainActivity : AppCompatActivity() {
     private fun hideProgress() {
         progress.visibility = View.GONE
         recycler_view.visibility  = View.VISIBLE
+    }
+
+    override fun onDialogSearchClick(dialog: DialogFragment, dialogEditText: String) {
+        viewModel.onRemoteSearch(dialogEditText)
+    }
+
+    fun onOpenAppSearch(location: Location){
+        viewModel.onOpenAppSearch(location.latitude.toString(), location.longitude.toString())
+    }
+
+    private fun requestLocationPermission(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
+            val alertDialog = AskPermissionsAlertDialog()
+            alertDialog.show(supportFragmentManager, "permissions")
+        } else {
+            grantPermission()
+        }
+    }
+
+    override fun onPermissionGrantedClick(dialog: DialogFragment) {
+        grantPermission()
+    }
+
+    private fun grantPermission(){
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), FINE_LOCATION_PERMISSION_CODE)
+        retrieveLocation()
+    }
+
+    private fun retrieveLocation(){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED){
+
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        onOpenAppSearch(it)
+                    } ?: run {
+                        showMessage(this@MainActivity, "No se pudo encontrar su localización")
+                        onSearchClicked()
+                    }
+                }
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED){
+            onSearchClicked()
+        } else {
+            requestLocationPermission()
+        }
     }
 }

@@ -4,5 +4,6 @@ import com.example.domain.entities.WeatherInformation
 import com.example.domain.util.Result
 
 interface WeatherInformationRepository {
-    fun getDailyWeatherByLatitudeAndLongitude(getFromRemote: Boolean): Result<WeatherInformation>
+    fun getDailyWeatherByCity(city: String, getFromRemote: Boolean): Result<WeatherInformation>
+    fun getDailyWeatherByCoordinates(lat: String, lon: String, getFromRemote: Boolean): Result<WeatherInformation>
 }

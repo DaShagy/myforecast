@@ -8,14 +8,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val LATITUDE_KEY_ARG = "lat"
-private const val LATITUDE_KEY_ARG_VALUE = "-26.824141"
-private const val LONGITUDE_KEY_ARG = "lon"
-private const val LONGITUDE_KEY_ARG_VALUE = "-65.222603"
-private const val TO_EXCLUDE_KEY_ARG = "exclude"
-private const val TO_EXCLUDE_KEY_ARG_VALUE = "current,minutely,hourly,alerts"
-private const val UNITS_KEY_ARG = "units"
-private const val UNITS_KEY_ARG_VALUE = "metric"
 private const val PUBLIC_API_KEY_ARG = "appid"
 private const val PUBLIC_API_KEY_ARG_VALUE = "077963ca38c545cea1f562582d62abeb"
 private const val OPEN_WEATHER_BASE_URL = "https://api.openweathermap.org/"
@@ -24,7 +16,7 @@ private const val INIT_TRYOUT = 1
 
 class OpenWeatherRequestGenerator {
 
-    val context = getApplicationContext()
+    private val context = getApplicationContext()
 
     private val httpClient = OkHttpClient.Builder()
         .addInterceptor(
@@ -39,10 +31,6 @@ class OpenWeatherRequestGenerator {
             val defaultHttpUrl = defaultRequest.url()
 
             val httpUrl = defaultHttpUrl.newBuilder()
-                .addQueryParameter(LATITUDE_KEY_ARG, LATITUDE_KEY_ARG_VALUE)
-                .addQueryParameter(LONGITUDE_KEY_ARG, LONGITUDE_KEY_ARG_VALUE)
-                .addQueryParameter(TO_EXCLUDE_KEY_ARG, TO_EXCLUDE_KEY_ARG_VALUE)
-                .addQueryParameter(UNITS_KEY_ARG, UNITS_KEY_ARG_VALUE)
                 .addQueryParameter(PUBLIC_API_KEY_ARG, PUBLIC_API_KEY_ARG_VALUE)
                 .build()
 
